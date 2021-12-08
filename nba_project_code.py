@@ -3,6 +3,8 @@ import json
 import unittest
 import os
 import sqlite3
+import matplotlib
+import matplotlib.pyplot as plt
 
 def get_scored(season1, season2, team, page):
     """
@@ -54,7 +56,7 @@ def create_teams_table(cur, conn):
 
 
 def setup_points_table(data, cur,conn):
-    cur.execute("CREATE TABLE IF NOT EXISTS Points(id INTEGER PRIMARY KEY, team_name STRING, date DATE,court INTEGER, points_scored_recieved INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Points(id INTEGER PRIMARY KEY, team_name STRING, date DATE,court INTEGER, points_scored INTEGER)")
     conn.commit()
     try:
         cur.execute('SELECT id FROM Points WHERE id  = (SELECT MAX(id) FROM Points)')
@@ -69,9 +71,56 @@ def setup_points_table(data, cur,conn):
         court = i[2]
         points = i[3]
         id = start + count
-        cur.execute("INSERT OR IGNORE INTO Points (id, team_name, date, court, points_scored_recieved) VALUES(?,?,?,?,?)", (id, team_name, date, court, points))
+        cur.execute("INSERT OR IGNORE INTO Points (id, team_name, date, court, points_scored) VALUES(?,?,?,?,?)", (id, team_name, date, court, points))
         count += 1
     conn.commit()
+
+def avg_points_scored(cur,conn):
+    cur.execute('''SELECT Teams.title as team_name, strftime('%m', Points.date) as month, Courts.title as court, AVG(Points.points_scored) as avg_scored
+                    FROM Points
+                    JOIN Teams
+                    ON Teams.id = Points.team_name
+                    JOIN Courts
+                    ON Points.court = Courts.id
+                    WHERE Points.court = 0
+                    GROUP BY strftime('%m', Points.date)
+                    ORDER BY month ="04", month ="03", month ="02", month= "01", month= "12", month ="11", month ="10"''')
+    home = cur.fetchall()
+
+    cur.execute('''SELECT Teams.title as team_name, strftime('%m', Points.date) as month, Courts.title as court, AVG(Points.points_scored) as avg_scored
+                    FROM Points
+                    JOIN Teams
+                    ON Teams.id = Points.team_name
+                    JOIN Courts
+                    ON Points.court = Courts.id
+                    WHERE Points.court = 1
+                    GROUP BY strftime('%m', Points.date)
+                    ORDER BY month ="04", month ="03", month ="02", month= "01", month= "12", month ="11", month ="10"''')
+    away = cur.fetchall()
+
+    return home, away
+
+def viz_one(data):
+    team = data[0][0][0]
+    months = []
+    points_home = []
+    points_away = []
+    for i in data[0]:
+        months.append(i[1])
+        points_home.append(i[3])
+    for i in data[1]:
+        points_away.append(i[3])
+
+    fig,ax = plt.subplots()
+    # plot the home points data
+    ax.plot(months, points_home, 'b-', label="Points Scored at Home")
+    # plot the away points data
+    ax.plot(months, points_away, 'g-', label="Points Scored Away")
+    ax.legend()
+    ax.set(xlabel='Month', ylabel='Number of Points', title='{} avg Number of Points Scored per Month- Home vs. Away'.format(team))
+    ax.grid()
+    fig.savefig('scored.png')
+    plt.show()
 
 def main():
     year1 = 2018
@@ -91,12 +140,9 @@ def main():
         page = 1
     data = get_scored(year1, year2, 1, page)
     setup_points_table(data, cur, conn)
+    avg = avg_points_scored(cur,conn)
+    viz_one(avg)
 
-
-
-# def main():
-#     # SETUP DATABASE AND TABLE
-#     cur, conn = setUpDatabase('game_stats.db')
     
     
 if __name__ == "__main__":
