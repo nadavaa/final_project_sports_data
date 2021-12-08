@@ -98,6 +98,22 @@ def avg_points_scored(cur,conn):
                     ORDER BY month ="04", month ="03", month ="02", month= "01", month= "12", month ="11", month ="10"''')
     away = cur.fetchall()
 
+    with open('data_file.txt', 'w') as f:
+        f.write('(Team, Month, Court, avg points scored)')
+        f.write('\n\n')
+        f.write('Home Game Data')
+        f.write('\n')
+        for i in home:
+            f.write(str(i))
+            f.write('\n')
+        
+        f.write('Away Game Data')
+        f.write('\n')
+        for i in away:
+            f.write(str(i))
+            f.write('\n')
+
+
     return home, away
 
 def viz_one(data):
@@ -113,9 +129,9 @@ def viz_one(data):
 
     fig,ax = plt.subplots()
     # plot the home points data
-    ax.plot(months, points_home, 'b-', label="Points Scored at Home")
+    ax.plot(months, points_home, 'bo-', label="Points Scored at Home")
     # plot the away points data
-    ax.plot(months, points_away, 'g-', label="Points Scored Away")
+    ax.plot(months, points_away, 'ro-', label="Points Scored Away")
     ax.legend()
     ax.set(xlabel='Month', ylabel='Number of Points', title='{} avg Number of Points Scored per Month- Home vs. Away'.format(team))
     ax.grid()
@@ -123,8 +139,47 @@ def viz_one(data):
     plt.show()
 
 def main():
+    #----------------------------------
+    #   index      team
+    #----------------------------------
+    #   1	    Atlanta Hawks
+    #   2	    Boston Celtics
+    #   3	    Brooklyn Nets
+    #   4	    Charlotte Hornets
+    #   5	    Chicago Bulls
+    #   6	    Cleveland Cavaliers
+    #   7	    Dallas Mavericks
+    #   8	    Denver Nuggets
+    #   9	    Detroit Pistons
+    #   10	    Golden State Warriors
+    #   11	    Houston Rockets
+    #   12	    Indiana Pacers
+    #   13	    LA Clippers
+    #   14	    Los Angeles Lakers
+    #   15	    Memphis Grizzlies
+    #   16	    Miami Heat
+    #   17	    Milwaukee Bucks
+    #   18	    Minnesota Timberwolves
+    #   19	    New Orleans Pelicans
+    #   20	    New York Knicks
+    #   21	    Oklahoma City Thunder
+    #   22	    Orlando Magic
+    #   23	    Philadelphia 76ers
+    #   24	    Phoenix Suns
+    #   25	    Portland Trail Blazers
+    #   26	    Sacramento Kings
+    #   27	    San Antonio Spurs
+    #   28	    Toronto Raptors
+    #   29	    Utah Jazz
+    #   30	    Washington Wizards
+    # ----------------------------  
+
+    # Choose what team and season you are interested in viewing
+    # Then, run code at least 6 times to get full data
+
     year1 = 2018
     year2 = 2019
+    team = 1
 
     cur, conn = setUpDatabase('nba_game_stats.db')
     create_court_table(cur, conn)
@@ -138,7 +193,7 @@ def main():
         page = (start+25) / 25
     except:
         page = 1
-    data = get_scored(year1, year2, 1, page)
+    data = get_scored(year1, year2, team, page)
     setup_points_table(data, cur, conn)
     avg = avg_points_scored(cur,conn)
     viz_one(avg)
