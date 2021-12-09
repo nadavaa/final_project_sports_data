@@ -1,0 +1,36 @@
+(Team, Month, Court, avg points scored)
+
+Home Game Data
+('Atlanta Hawks', '10', 'Home', 99.8)
+('Atlanta Hawks', '11', 'Home', 111.92857142857143)
+('Atlanta Hawks', '12', 'Home', 107.83333333333333)
+('Atlanta Hawks', '01', 'Home', 118.77777777777777)
+('Atlanta Hawks', '02', 'Home', 121.81818181818181)
+('Atlanta Hawks', '03', 'Home', 121.625)
+('Atlanta Hawks', '04', 'Home', 132.0)
+Away Game Data
+('Atlanta Hawks', '10', 'Away', 111.0)
+('Atlanta Hawks', '11', 'Away', 103.17647058823529)
+('Atlanta Hawks', '12', 'Away', 110.8)
+('Atlanta Hawks', '01', 'Away', 109.76470588235294)
+('Atlanta Hawks', '02', 'Away', 114.5)
+('Atlanta Hawks', '03', 'Away', 111.44444444444444)
+('Atlanta Hawks', '04', 'Away', 110.33333333333333)
+(Team, Month, Court, avg points recieved)
+
+Home Game Data
+('Atlanta Hawks', '10', 'Home', 102.2)
+('Atlanta Hawks', '11', 'Home', 121.5)
+('Atlanta Hawks', '12', 'Home', 112.25)
+('Atlanta Hawks', '01', 'Home', 117.33333333333333)
+('Atlanta Hawks', '02', 'Home', 120.86363636363636)
+('Atlanta Hawks', '03', 'Home', 127.3125)
+('Atlanta Hawks', '04', 'Home', 128.5)
+Away Game Data
+('Atlanta Hawks', '10', 'Away', 118.42857142857143)
+('Atlanta Hawks', '11', 'Away', 119.82352941176471)
+('Atlanta Hawks', '12', 'Away', 119.86666666666666)
+('Atlanta Hawks', '01', 'Away', 121.17647058823529)
+('Atlanta Hawks', '02', 'Away', 123.75)
+('Atlanta Hawks', '03', 'Away', 117.11111111111111)
+('Atlanta Hawks', '04', 'Away', 127.0)
