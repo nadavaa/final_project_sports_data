@@ -1,9 +1,8 @@
 Country, Number of Players for Country, Average Height
-CAN,21,71.76
-DEU,3,72.00
-SWE,8,73.00
-USA,8,72.62
+CAN,14,72.29
+DEU,2,72.50
+SWE,2,71.00
+USA,1,73.00
 AUT,1,69.00
-RUS,6,73.50
-FIN,2,73.50
-CZE,1,70.00
+RUS,4,73.50
+FIN,1,73.00

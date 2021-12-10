@@ -212,7 +212,7 @@ def main():
     d_year2 = 2020
     data_list = get_info(d_year2)
 
-    cur, conn = setUpDatabase('nhl_draft_data.db')
+    cur, conn = setUpDatabase('sports_data.db')
 
     create_country_table(cur, conn, data_list)
     create_player_table(cur, conn, data_list)
