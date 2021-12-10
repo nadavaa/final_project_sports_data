@@ -240,7 +240,7 @@ def main():
     year2 = 2019
     team = 1
 
-    cur, conn = setUpDatabase('nba_game_stats.db')
+    cur, conn = setUpDatabase('sports_data.db')
     create_court_table(cur, conn)
     create_teams_table(cur, conn)
 
