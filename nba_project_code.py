@@ -194,7 +194,8 @@ def viz_one(data):
     plt.legend()
     plt.grid()
 
-    plt.savefig('scored_recieved.png')
+    # plt.savefig('scored_recieved.png')
+    plt.tight_layout(pad=0.8)
     plt.show()
 
 def main():
