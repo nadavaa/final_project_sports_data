@@ -21,7 +21,7 @@ def get_scored(season1, season2, team, page):
     data = r.json()
     dict_list = data
 
-    for i in dict_list['data']:
+    for i in dict_list['data']: # get data about the points scored and recieved from the API
         if i['home_team']['id'] == team:
             points_list.append((i['date'][:10],i['home_team']['id'], 0,i['home_team_score'], i['visitor_team_score']))
         elif i['visitor_team']['id'] == team:
@@ -235,17 +235,17 @@ def main():
     # ----------------------------  
 
     # Choose what team and season you are interested in viewing
-    # Then, run code at least 8 times to get full data
+    # Then, run code 7 times to get full data
 
     year1 = 2018
     year2 = 2019
     team = 1
 
-    cur, conn = setUpDatabase('sports_data.db')
+    cur, conn = setUpDatabase('sports_data.db') # setting up database
     create_court_table(cur, conn)
     create_teams_table(cur, conn)
 
-#To gather all data for both seasons, run code 8 times.
+#To gather all data for both seasons, run code 7 times.
     try:
         cur.execute('SELECT id FROM Points WHERE id  = (SELECT MAX(id) FROM Points)')
         start = cur.fetchone()
@@ -256,12 +256,12 @@ def main():
     data = get_scored(year1, year2, team, page)
     setup_points_table(data, cur, conn)
 
-    if data == []:
+    cur.execute('SELECT COUNT(id) FROM Points')
+    count = cur.fetchall()[0][0]
+    if count == 173:
         avg = avg_points_scored(cur,conn)
         viz_one(avg)
 
-
-    
     
 if __name__ == "__main__":
     main()
