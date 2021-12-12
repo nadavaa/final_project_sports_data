@@ -9,8 +9,8 @@ import numpy as np
 
 def get_scored(season1, season2, team, page):
     """
-    This function takes two seasons(for example 2018,2019- will return data for 2018-2019 and 2019-2020 seasons).
-    and a team. It will call the balldontlie API to get the points scored dat for that team in that season.
+    This function takes two seasons(for example 2018,2019- will return data for 2018-2019 and 2019-2020 seasons),
+    a team, and a page number. It will call the balldontlie API to get the points scored for that team in the chosen seasons.
     It will return the data as a list that represent the points scored in each game that season.
     """
     points_list = []
@@ -31,19 +31,30 @@ def get_scored(season1, season2, team, page):
 
 # Create Database
 def setUpDatabase(db_name):
+    """
+    This function takes in a database name (string). It returns the database curser and connection. It creates the database.
+    """
     path = os.path.dirname(os.path.abspath(__file__))
     conn = sqlite3.connect(path+'/'+db_name)
     cur = conn.cursor()
     return cur, conn
 
 def create_court_table(cur,conn):
+    """
+    Takes in the database curser and connection.
+    It creates the Court table in the database and holds the court id and whether its home or away and returns nothing.
+    """
     court = ["Home", "Away"]
     cur.execute("CREATE TABLE IF NOT EXISTS Courts(id INTEGER PRIMARY KEY, title TEXT)")
     for i in range(len(court)):
         cur.execute("INSERT OR IGNORE INTO Courts (id, title) VALUES (?,?)", (i,court[i]))
     conn.commit()
 
-def create_teams_table(cur, conn):
+def create_teams_table(cur,conn):
+    """
+    Takes in the database curser and connection.It creates the Teams table in the database and holds the team id and the team names.
+    returns nothing.
+    """
     re =requests.get('https://www.balldontlie.io/api/v1/teams')
     data = re.json()
     dict_list = data
@@ -56,6 +67,10 @@ def create_teams_table(cur, conn):
 
 
 def setup_points_table(data, cur,conn):
+    """
+    Takes in data (a list of tuples returned from the get_scored function), and the database curser and connection. 
+    It creates a table Points in the database. It adds to the table 25 rows from data at a time
+    """
     cur.execute("CREATE TABLE IF NOT EXISTS Points(id INTEGER PRIMARY KEY, team_name STRING, date DATE,court INTEGER, points_scored INTEGER, points_recieved INTEGER)")
     conn.commit()
     try:
@@ -77,6 +92,11 @@ def setup_points_table(data, cur,conn):
     conn.commit()
 
 def avg_points_scored(cur,conn):
+    """
+    Takes in the database cureser and connection. Fetches the team name, month, court, and avg points scored and recived.
+    the query organzies the data by month and court to return the average points scored and revieved each month in each court.
+    the function writes the data into a text file and returns 4 lists of tuples(home_scored, away_scored, home_recieved, away_recieved)
+    """
     cur.execute('''SELECT Teams.title as team_name, strftime('%m', Points.date) as month, Courts.title as court, AVG(Points.points_scored) as avg_scored
                     FROM Points
                     JOIN Teams
@@ -124,27 +144,26 @@ def avg_points_scored(cur,conn):
     with open('data_file.txt', 'w') as f:
         f.write('(Team, Month, Court, avg points scored)')
         f.write('\n\n')
-        f.write('Home Game Data')
+        f.write('Home Game Data- Points Scored')
         f.write('\n')
         for i in home_scored:
             f.write(str(i))
             f.write('\n')
         
-        f.write('Away Game Data')
+        f.write('Away Game Data- Points Scored')
         f.write('\n')
         for i in away_scored:
             f.write(str(i))
             f.write('\n')
 
-        f.write('(Team, Month, Court, avg points recieved)')
         f.write('\n\n')
-        f.write('Home Game Data')
+        f.write('Home Game Data- Points Recieved')
         f.write('\n')
         for i in home_recieved:
             f.write(str(i))
             f.write('\n')
         
-        f.write('Away Game Data')
+        f.write('Away Game Data- Points Recieved')
         f.write('\n')
         for i in away_recieved:
             f.write(str(i))
@@ -153,8 +172,11 @@ def avg_points_scored(cur,conn):
     return home_scored, away_scored, home_recieved, away_recieved
 
 def viz_one(data):
-    # print(data)
-    # print('\n\n\n')
+    """
+    takes in data (list of 4 tuples which were returned from avg_points_scored function).
+    Creates 2 visualizations. First, a line plot of the average points scored by the team per month at home vs. away.
+    Second, a line plot of the average points recieved by the team per month at home vs. away.
+    """
     team = data[0][0][0]
     months = []
     points_scored_home = []
@@ -174,11 +196,12 @@ def viz_one(data):
     x = np.array(months)
     y1 = np.array(points_scored_home)
     y2 = np.array(points_scored_away)
+    plt.figure(figsize=(10,5))
     plt.subplot(2, 1, 1)
     plt.plot(x,y1, 'o-', label="Points Scored at Home")
     plt.plot(x,y2, 'ro-', label="Points Scored Away")
     plt.title('{} avg Number of Points Scored per Month- Home vs. Away'.format(team))
-    plt.xlabel('months')
+    plt.xlabel('month')
     plt.ylabel('avg points recived')
     plt.legend()
     plt.grid()
@@ -189,7 +212,7 @@ def viz_one(data):
     plt.plot(x,y1, 'o-', label="Points Recieved at Home")
     plt.plot(x,y2, 'ro-', label="Points Recieved Away")
     plt.title('{} avg Number of Points Recieved per Month- Home vs. Away'.format(team))
-    plt.xlabel('months')
+    plt.xlabel('month')
     plt.ylabel('avg points scored')
     plt.legend()
     plt.grid()
@@ -235,17 +258,16 @@ def main():
     # ----------------------------  
 
     # Choose what team and season you are interested in viewing
-    # Then, run code 7 times to get full data
+    #To gather all data for both seasons, run code until visualization appears(between 7-12 times, depending on the year and team chosen).
 
     year1 = 2018
-    year2 = 2019
-    team = 1
+    year2 = 2014
+    team = 6
 
     cur, conn = setUpDatabase('sports_data.db') # setting up database
     create_court_table(cur, conn)
     create_teams_table(cur, conn)
 
-#To gather all data for both seasons, run code 7 times.
     try:
         cur.execute('SELECT id FROM Points WHERE id  = (SELECT MAX(id) FROM Points)')
         start = cur.fetchone()
@@ -256,12 +278,19 @@ def main():
     data = get_scored(year1, year2, team, page)
     setup_points_table(data, cur, conn)
 
-    cur.execute('SELECT COUNT(id) FROM Points')
-    count = cur.fetchall()[0][0]
-    if count == 173:
+    if data == []:
         avg = avg_points_scored(cur,conn)
         viz_one(avg)
 
     
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
+
